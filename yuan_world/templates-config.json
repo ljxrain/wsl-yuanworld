@@ -1,0 +1,95 @@
+{
+  "templates": [
+    {
+      "name": "浪漫婚纱照",
+      "description": "专业婚纱摄影风格，浪漫唯美，适合结婚纪念",
+      "category": "wedding",
+      "thumbnail_url": "/images/templates/wedding-1-thumb.jpg",
+      "preview_url": "/images/templates/wedding-1-preview.jpg",
+      "idol_image_url": "/images/templates/wedding-1-idol.jpg",
+      "prompt": "Transform the portrait into elegant wedding photography style with romantic lighting, soft focus, professional studio quality, dreamy atmosphere, white wedding dress, natural pose, beautiful background",
+      "is_vip_only": false,
+      "sort_order": 100,
+      "tags": ["婚纱", "浪漫", "专业"]
+    },
+    {
+      "name": "时尚杂志封面",
+      "description": "高端时尚大片风格，适合个人写真",
+      "category": "fashion",
+      "thumbnail_url": "/images/templates/fashion-1-thumb.jpg",
+      "preview_url": "/images/templates/fashion-1-preview.jpg",
+      "idol_image_url": "/images/templates/fashion-1-idol.jpg",
+      "prompt": "Transform into high fashion magazine cover style, professional model pose, dramatic lighting, editorial photography, glamorous makeup, stylish outfit, confident expression, vogue style",
+      "is_vip_only": false,
+      "sort_order": 95,
+      "tags": ["时尚", "大片", "杂志"]
+    },
+    {
+      "name": "情侣甜蜜照",
+      "description": "温馨情侣照片，记录美好瞬间",
+      "category": "couple",
+      "thumbnail_url": "/images/templates/couple-1-thumb.jpg",
+      "preview_url": "/images/templates/couple-1-preview.jpg",
+      "idol_image_url": "/images/templates/couple-1-idol.jpg",
+      "prompt": "Transform into romantic couple photography style with sweet atmosphere, natural interaction, warm tones, candid moments, loving expression, intimate poses, sunset lighting",
+      "is_vip_only": false,
+      "sort_order": 90,
+      "tags": ["情侣", "浪漫", "温馨"]
+    },
+    {
+      "name": "艺术人像大师",
+      "description": "艺术风格人像，创意无限（VIP专享）",
+      "category": "art",
+      "thumbnail_url": "/images/templates/art-1-thumb.jpg",
+      "preview_url": "/images/templates/art-1-preview.jpg",
+      "idol_image_url": "/images/templates/art-1-idol.jpg",
+      "prompt": "Transform into artistic portrait photography style with creative composition, unique lighting, artistic atmosphere, expressive mood, professional retouching, artistic vision, museum quality",
+      "is_vip_only": true,
+      "sort_order": 85,
+      "tags": ["艺术", "创意", "大师级"]
+    },
+    {
+      "name": "生活记录者",
+      "description": "自然生活化风格，记录真实美好",
+      "category": "life",
+      "thumbnail_url": "/images/templates/life-1-thumb.jpg",
+      "preview_url": "/images/templates/life-1-preview.jpg",
+      "idol_image_url": "/images/templates/life-1-idol.jpg",
+      "prompt": "Transform into natural lifestyle photography style with authentic moments, casual atmosphere, natural light, everyday beauty, candid shots, genuine expressions, documentary style",
+      "is_vip_only": false,
+      "sort_order": 80,
+      "tags": ["生活", "自然", "真实"]
+    }
+  ],
+  "instructions": {
+    "说明": "这是模板配置文件，修改后运行导入脚本即可更新数据库",
+    "字段说明": {
+      "name": "模板名称（必填）",
+      "description": "模板描述（必填）",
+      "category": "分类（必填）: life/couple/wedding/fashion/art",
+      "thumbnail_url": "缩略图地址（必填，在模板中心显示）",
+      "preview_url": "预览图地址（必填，点击查看大图）",
+      "idol_image_url": "偶像照片地址（必填，用于AI生图的参考照片）",
+      "prompt": "生图提示词（必填，AI生图时使用）",
+      "is_vip_only": "是否VIP专享（true/false）",
+      "sort_order": "排序权重（数字越大越靠前）",
+      "tags": "标签数组（可选，用于搜索和展示）"
+    },
+    "图片位置": {
+      "说明": "图片应该放在 public/images/templates/ 目录下",
+      "命名建议": "category-序号-类型.jpg，例如: wedding-1-thumb.jpg"
+    },
+    "导入方法": "运行命令: node server/scripts/import-templates-from-json.js"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+

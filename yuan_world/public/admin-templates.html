@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模板配置管理 - 元影AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #90EE90;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .template-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #333;
+            transition: all 0.3s;
+        }
+        
+        .template-card:hover {
+            border-color: #90EE90;
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .template-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .template-id {
+            background: #90EE90;
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .template-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            flex: 1;
+        }
+        
+        .template-status {
+            font-size: 0.9rem;
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+        
+        .status-complete {
+            background: rgba(144,238,144,0.2);
+            color: #90EE90;
+        }
+        
+        .status-incomplete {
+            background: rgba(255,107,107,0.2);
+            color: #ff6b6b;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #90EE90;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #222;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #90EE90;
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .image-preview-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .image-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #333;
+        }
+        
+        .image-info {
+            flex: 1;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #90EE90, #7FD87F);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(144,238,144,0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-save-all {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 20px rgba(144,238,144,0.4);
+            z-index: 1000;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .alert-success {
+            background: rgba(144,238,144,0.2);
+            border: 2px solid #90EE90;
+            color: #90EE90;
+        }
+        
+        .alert-error {
+            background: rgba(255,107,107,0.2);
+            border: 2px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .spinner {
+            border: 4px solid #333;
+            border-top: 4px solid #90EE90;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hint {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 模板配置管理</h1>
+        <p class="subtitle">编辑模板的分类、名称、图片路径、Prompt等信息</p>
+        
+        <div id="alertArea"></div>
+        
+        <div id="loadingArea" class="loading">
+            <div class="spinner"></div>
+            <p>正在加载模板数据...</p>
+        </div>
+        
+        <div style="display: none; margin-bottom: 20px; gap: 15px; justify-content: center;" id="actionButtons">
+            <button id="addNewBtn" class="btn btn-primary" style="background: #4CAF50;">
+                ➕ 新建模板
+            </button>
+            <button id="saveAllBtn" class="btn btn-primary btn-save-all">
+                💾 保存所有更改
+            </button>
+        </div>
+        
+        <div id="templatesArea" style="display: none;"></div>
+    </div>
+    
+    <script>
+        let templates = [];
+        let hasChanges = false;
+        
+        // 加载数据
+        async function loadData() {
+            try {
+                // 检查登录状态（简化版，不强制验证）
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showAlert('⚠️ 请先登录！正在跳转...', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+                    }, 1500);
+                    return;
+                }
+                
+                console.log('✓ Token存在，继续加载模板...');
+                
+                // 加载所有模板（包括管理员可见的完整信息）
+                const templatesRes = await fetch('/api/templates');
+                const templatesData = await templatesRes.json();
+                templates = Array.isArray(templatesData) ? templatesData : (templatesData.templates || []);
+                
+                console.log(`📋 加载了 ${templates.length} 个模板`);
+                
+                renderTemplates();
+                
+                document.getElementById('loadingArea').style.display = 'none';
+                document.getElementById('templatesArea').style.display = 'block';
+                document.getElementById('actionButtons').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                showAlert('加载数据失败：' + error.message, 'error');
+            }
+        }
+        
+        // 渲染模板列表
+        function renderTemplates() {
+            const container = document.getElementById('templatesArea');
+            container.innerHTML = '';
+            
+            templates.forEach(template => {
+                const isComplete = template.name && template.category && template.image_path;
+                
+                const card = document.createElement('div');
+                card.className = 'template-card';
+                card.innerHTML = `
+                    <div class="template-header">
+                        <span class="template-id">ID ${template.id}</span>
+                        <span class="template-name">${template.name}</span>
+                        <span class="template-status ${isComplete ? 'status-complete' : 'status-incomplete'}">
+                            ${isComplete ? '✅ 信息完整' : '⚠️ 信息不全'}
+                        </span>
+                        <button 
+                            type="button" 
+                            class="btn" 
+                            data-action="delete-template" 
+                            data-template-id="${template.id}"
+                            style="background: #ff4444; margin-left: 10px; padding: 5px 15px;"
+                        >
+                            🗑️ 删除
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">🏷️ 模板名称</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="name-${template.id}"
+                            placeholder="例如：都市夜景、摩天轮爱恋、白纱仙境..."
+                            value="${template.name || ''}"
+                            onchange="markChanged()"
+                        />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">📂 模板分类</label>
+                        <select 
+                            class="form-select" 
+                            id="category-${template.id}"
+                            onchange="markChanged()"
+                        >
+                            <option value="">请选择分类</option>
+                            <option value="life" ${template.category === 'life' ? 'selected' : ''}>📸 生活照</option>
+                            <option value="couple" ${template.category === 'couple' ? 'selected' : ''}>💕 情侣照</option>
+                            <option value="wedding" ${template.category === 'wedding' ? 'selected' : ''}>💒 婚纱照</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">🖼️ 图片路径</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="image_path-${template.id}"
+                            placeholder="/images/偶像图片/Generated Image October 03, 2025 - 10_18PM.png"
+                            value="${template.image_path || ''}"
+                            onchange="markChanged()"
+                        />
+                        ${template.image_path ? `<img src="${template.image_path}" style="max-width: 200px; margin-top: 10px; border-radius: 8px;">` : ''}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">📝 生成Prompt（选填，用于AI生成）</label>
+                        <textarea 
+                            class="form-textarea" 
+                            id="prompt-${template.id}"
+                            placeholder="输入prompt，描述这个模板的风格特征..."
+                            onchange="markChanged()"
+                        >${template.prompt || ''}</textarea>
+                        <div class="hint">
+                            💡 提示：描述该模板的风格，例如："都市夜景下的浪漫约会照"
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">🖼️ 偶像参考照片</label>
+                        <input 
+                            type="file" 
+                            class="form-input" 
+                            id="idol-file-${template.id}"
+                            accept="image/jpeg,image/png,image/jpg,image/webp"
+                            onchange="handleIdolImageUpload(${template.id})"
+                            style="display: none;"
+                        >
+                        <input 
+                            type="hidden" 
+                            id="idol-url-${template.id}" 
+                            value="${template.idol_image_url || ''}"
+                        >
+                        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                            <button 
+                                type="button" 
+                                class="btn btn-primary" 
+                                onclick="document.getElementById('idol-file-${template.id}').click()"
+                                style="white-space: nowrap;"
+                            >
+                                📁 从本地选择照片
+                            </button>
+                            <input 
+                                type="text" 
+                                class="form-input" 
+                                id="idol-input-${template.id}"
+                                placeholder="或粘贴图片URL（如 /images/idols/xxx.jpg）"
+                                value="${template.idol_image_url || ''}"
+                                style="flex: 1;"
+                                oninput="handleIdolUrlInput(${template.id})"
+                            />
+                        </div>
+                        
+                        ${template.idol_image_url ? `
+                            <div class="image-preview-container" id="preview-container-${template.id}">
+                                <img 
+                                    src="${template.idol_image_url}" 
+                                    class="image-preview" 
+                                    id="preview-${template.id}" 
+                                    alt="预览"
+                                    onerror="this.style.display='none'; document.getElementById('preview-info-${template.id}').innerHTML='❌ 图片加载失败<br>路径：${template.idol_image_url}';"
+                                >
+                                <div class="image-info" id="preview-info-${template.id}">
+                                    当前图片：${template.idol_image_url}
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="image-preview-container" id="preview-container-${template.id}" style="display: none;">
+                                <img 
+                                    src="" 
+                                    class="image-preview" 
+                                    id="preview-${template.id}" 
+                                    alt="预览"
+                                    onerror="this.style.display='none';"
+                                >
+                                <div class="image-info" id="preview-info-${template.id}"></div>
+                            </div>
+                        `}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // 处理URL输入（实时预览）
+        function handleIdolUrlInput(templateId) {
+            const input = document.getElementById(`idol-input-${templateId}`);
+            const url = (input.value || '').trim();
+            const hidden = document.getElementById(`idol-url-${templateId}`);
+            const container = document.getElementById(`preview-container-${templateId}`);
+            const preview = document.getElementById(`preview-${templateId}`);
+            const info = document.getElementById(`preview-info-${templateId}`);
+            
+            // 更新隐藏域
+            if (hidden) hidden.value = url;
+            markChanged();
+            
+            if (!url) {
+                if (container) container.style.display = 'none';
+                return;
+            }
+            
+            // 实时预览
+            if (preview) {
+                preview.onerror = function() {
+                    this.style.display = 'none';
+                    if (info) info.innerHTML = `❌ 图片加载失败<br>路径：${url}`;
+                };
+                preview.onload = function() {
+                    this.style.display = 'block';
+                    if (info) info.textContent = '✅ 图片加载成功：' + url;
+                };
+                preview.src = url;
+            }
+            if (container) container.style.display = 'flex';
+            if (info) info.textContent = '正在加载：' + url;
+        }
+        
+        // 处理偶像照片上传
+        async function handleIdolImageUpload(templateId) {
+            const fileInput = document.getElementById(`idol-file-${templateId}`);
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                return;
+            }
+            
+            // 检查文件大小（最大10MB）
+            if (file.size > 10 * 1024 * 1024) {
+                alert('图片文件太大，请选择小于10MB的图片');
+                fileInput.value = '';
+                return;
+            }
+            
+            // 显示上传中状态
+            const container = document.getElementById(`preview-container-${templateId}`);
+            const preview = document.getElementById(`preview-${templateId}`);
+            const info = document.getElementById(`preview-info-${templateId}`);
+            
+            info.textContent = '正在上传...';
+            container.style.display = 'flex';
+            
+            try {
+                // 上传文件
+                const formData = new FormData();
+                formData.append('idolImage', file);
+                
+                const response = await fetch('/api/generate/upload-idol-image', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || '上传失败');
+                }
+                
+                // 更新UI
+                const imageUrl = data.imageUrl;
+                document.getElementById(`idol-url-${templateId}`).value = imageUrl;
+                document.getElementById(`idol-input-${templateId}`).value = imageUrl; // 同步到输入框
+                
+                // 显示预览容器
+                container.style.display = 'flex';
+                preview.style.display = 'block';
+                preview.src = imageUrl;
+                info.textContent = '✅ 上传成功：' + imageUrl;
+                
+                markChanged();
+                
+                console.log(`✅ 模板${templateId}的偶像照片上传成功:`, imageUrl);
+                
+            } catch (error) {
+                console.error('上传失败:', error);
+                alert('上传失败：' + error.message);
+                info.textContent = '❌ 上传失败';
+                fileInput.value = '';
+            }
+        }
+
+        // applyIdolUrl 改为事件委托处理
+        
+        // 标记有更改
+        function markChanged() {
+            hasChanges = true;
+            const btn = document.getElementById('saveAllBtn');
+            btn.textContent = '💾 保存所有更改 *';
+        }
+        
+        // 保存所有更改
+        async function saveAll() {
+            const btn = document.getElementById('saveAllBtn');
+            btn.disabled = true;
+            btn.textContent = '正在保存...';
+            
+            let successCount = 0;
+            let failCount = 0;
+            
+            // 获取token
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showAlert('❌ 请先登录！', 'error');
+                btn.disabled = false;
+                btn.textContent = '💾 保存所有更改';
+                return;
+            }
+            
+            for (const template of templates) {
+                try {
+                    const name = document.getElementById(`name-${template.id}`).value.trim();
+                    const category = document.getElementById(`category-${template.id}`).value;
+                    const image_path = document.getElementById(`image_path-${template.id}`).value.trim();
+                    const prompt = document.getElementById(`prompt-${template.id}`).value.trim();
+                    const idol_image_url = document.getElementById(`idol-url-${template.id}`).value.trim();
+                    
+                    // 验证必填字段
+                    if (!name || !category || !image_path) {
+                        console.warn(`⚠️ 模板 ${template.id} 缺少必填字段，跳过`);
+                        failCount++;
+                        continue;
+                    }
+                    
+                    // 兜底拿 idol_image_url：优先隐藏域，其次输入框
+                    const idolFromHidden = document.getElementById(`idol-url-${template.id}`).value.trim();
+                    const idolFromInput = document.getElementById(`idol-input-${template.id}`).value.trim();
+                    const idol_image_url_final = idolFromHidden || idolFromInput || null;
+                    
+                    const response = await fetch(`/api/templates/${template.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ 
+                            name, 
+                            category, 
+                            image_path, 
+                            prompt: prompt || null,
+                            idol_image_url: idol_image_url_final,
+                            sort_order: template.sort_order || 100
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        successCount++;
+                        console.log(`✅ 模板 ${template.id} (${name}) 保存成功`);
+                        const info = document.getElementById(`preview-info-${template.id}`);
+                        if (info && idol_image_url_final) info.textContent = '已保存：' + idol_image_url_final;
+                    } else {
+                        const error = await response.json();
+                        failCount++;
+                        console.error(`❌ 模板 ${template.id} 保存失败:`, error.message);
+                    }
+                    
+                } catch (error) {
+                    failCount++;
+                    console.error(`❌ 模板 ${template.id} 保存失败:`, error);
+                }
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '💾 保存所有更改';
+            hasChanges = false;
+            
+            if (failCount === 0) {
+                showAlert(`✅ 成功保存 ${successCount} 个模板！`, 'success');
+                // 重新加载数据
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                showAlert(`⚠️ 成功保存 ${successCount} 个，失败 ${failCount} 个`, 'error');
+            }
+        }
+        
+        // 显示提示
+        function showAlert(message, type) {
+            const alertArea = document.getElementById('alertArea');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertArea.innerHTML = '';
+            alertArea.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        
+        // 页面加载时
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            // 事件委托：处理“应用”按钮
+            document.body.addEventListener('click', (e) => {
+                // 处理"删除"按钮
+                const deleteBtn = e.target.closest('[data-action="delete-template"]');
+                if (deleteBtn) {
+                    const id = deleteBtn.getAttribute('data-template-id');
+                    deleteTemplate(id);
+                    return;
+                }
+            });
+        });
+        
+        // 删除模板
+        async function deleteTemplate(id) {
+            const template = templates.find(t => t.id == id);
+            if (!template) return;
+            
+            if (!confirm(`确定要删除模板"${template.name}"吗？此操作不可恢复！`)) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/templates/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('删除失败');
+                }
+                
+                // 从本地数组中移除
+                templates = templates.filter(t => t.id != id);
+                renderTemplates();
+                showAlert(`✅ 模板"${template.name}"已删除`, 'success');
+                
+            } catch (error) {
+                console.error('删除模板失败:', error);
+                showAlert('❌ 删除失败：' + error.message, 'error');
+            }
+        }
+        
+        // 新建模板
+        async function addNewTemplate() {
+            const name = prompt('请输入新模板的名称：');
+            if (!name || !name.trim()) return;
+            
+            const category = prompt('请选择分类 (life/couple/wedding):', 'life');
+            if (!category) return;
+            
+            const image_path = prompt('请输入模板展示图片路径 (如 /images/templates/xxx.jpg):', '');
+            if (!image_path) {
+                showAlert('图片路径不能为空', 'error');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/templates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name: name.trim(),
+                        category,
+                        image_path: image_path.trim(),
+                        prompt: '',
+                        idol_image_url: null,
+                        sort_order: templates.length * 10 + 100
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || '创建失败');
+                }
+                
+                const newTemplate = await response.json();
+                templates.push(newTemplate);
+                renderTemplates();
+                showAlert(`✅ 模板"${name}"创建成功！`, 'success');
+                
+            } catch (error) {
+                console.error('创建模板失败:', error);
+                showAlert('❌ 创建失败：' + error.message, 'error');
+            }
+        }
+        
+        // 保存按钮点击
+        document.getElementById('saveAllBtn').addEventListener('click', saveAll);
+        document.getElementById('addNewBtn').addEventListener('click', addNewTemplate);
+        
+        // 离开前提示
+        window.addEventListener('beforeunload', (e) => {
+            if (hasChanges) {
+                e.preventDefault();
+                e.returnValue = '你有未保存的更改，确定要离开吗？';
+            }
+        });
+    </script>
+</body>
+</html>

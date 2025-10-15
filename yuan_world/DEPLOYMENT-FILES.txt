@@ -1,0 +1,54 @@
+Yuan World 部署文件清单
+==========================================
+
+📁 项目根目录部署文件：
+
+🔧 WSL配置
+  ├─ setup-wsl.sh              WSL自动配置脚本（可执行）
+  └─ WSL-DEPLOYMENT.md         WSL部署详细文档
+
+🐳 Docker配置
+  ├─ Dockerfile                应用镜像构建文件
+  ├─ docker-compose.yml        容器编排配置
+  ├─ .dockerignore             Docker构建排除文件
+  ├─ .env.docker               环境变量模板
+  ├─ docker-init-db.sh         数据库初始化脚本
+  └─ DOCKER-DEPLOYMENT.md      Docker部署详细文档
+
+🚀 部署工具
+  └─ deploy.sh                 一键部署脚本（可执行）
+
+📖 文档
+  ├─ QUICK-START.md            快速开始指南（推荐先看）
+  ├─ DEPLOYMENT-CHECKLIST.md   部署检查清单
+  ├─ MIGRATION-SUMMARY.md      迁移总结文档
+  └─ README.md                 项目说明（已更新部署部分）
+
+🌐 Nginx配置
+  └─ nginx/
+      └─ nginx.conf            Nginx反向代理配置
+
+📦 现有文件（保持不变）
+  ├─ server/                   后端代码
+  ├─ public/                   前端文件
+  ├─ package.json              项目依赖
+  ├─ env.example               环境变量示例
+  ├─ create-database.sql       数据库创建脚本
+  └─ yuan_world_full.dump      数据库备份文件（重要！）
+
+==========================================
+
+📋 快速开始：
+
+1. WSL环境测试
+   ./setup-wsl.sh
+
+2. Docker本地测试
+   ./deploy.sh
+
+3. 阅读文档
+   - 新手：QUICK-START.md
+   - 详细：WSL-DEPLOYMENT.md 或 DOCKER-DEPLOYMENT.md
+   - 检查：DEPLOYMENT-CHECKLIST.md
+
+==========================================

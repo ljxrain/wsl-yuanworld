@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>API测试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+        .test-section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #333; margin-top: 0; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        button:hover { background: #45a049; }
+        .result { margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 4px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        input { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <h1>🔧 源世界 API 测试工具</h1>
+    
+    <div class="test-section">
+        <h2>1. 测试服务器健康状态</h2>
+        <button onclick="testHealth()" style="cursor: pointer;">测试健康检查</button>
+        <button onclick="alert('按钮可以点击！')" style="background: #2196F3; cursor: pointer;">测试点击</button>
+        <div id="health-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 测试用户登录</h2>
+        <input type="email" id="login-email" placeholder="邮箱" value="admin@yuanworld.com">
+        <input type="password" id="login-password" placeholder="密码" value="admin123456">
+        <button onclick="testLogin()">测试登录</button>
+        <div id="login-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 测试用户注册</h2>
+        <input type="text" id="reg-username" placeholder="用户名" value="testuser">
+        <input type="email" id="reg-email" placeholder="邮箱" value="test@example.com">
+        <input type="password" id="reg-password" placeholder="密码" value="test123456">
+        <button onclick="testRegister()">测试注册</button>
+        <div id="register-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 测试静态文件加载</h2>
+        <button onclick="testStaticFiles()">测试文件</button>
+        <div id="static-result" class="result"></div>
+    </div>
+
+    <script>
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.textContent = '正在测试...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = '✅ 成功！\n\n' + JSON.stringify(data, null, 2);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = '❌ 失败！\n\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ 网络错误：\n\n' + error.message;
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            resultDiv.textContent = '正在测试登录...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = '✅ 登录成功！\n\n' + JSON.stringify(data, null, 2);
+                    localStorage.setItem('token', data.token);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = '❌ 登录失败（' + response.status + '）：\n\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ 网络错误：\n\n' + error.message;
+            }
+        }
+
+        async function testRegister() {
+            const resultDiv = document.getElementById('register-result');
+            const username = document.getElementById('reg-username').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            
+            resultDiv.textContent = '正在测试注册...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = '✅ 注册成功！\n\n' + JSON.stringify(data, null, 2);
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = '❌ 注册失败（' + response.status + '）：\n\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ 网络错误：\n\n' + error.message;
+            }
+        }
+
+        async function testStaticFiles() {
+            const resultDiv = document.getElementById('static-result');
+            resultDiv.textContent = '正在测试...';
+            resultDiv.className = 'result';
+            
+            const files = [
+                '/index.html',
+                '/create.html',
+                '/gallery.html'
+            ];
+            
+            let results = '';
+            for (const file of files) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        results += `✅ ${file} - OK (${response.status})\n`;
+                    } else {
+                        results += `❌ ${file} - 失败 (${response.status})\n`;
+                    }
+                } catch (error) {
+                    results += `❌ ${file} - 错误: ${error.message}\n`;
+                }
+            }
+            
+            resultDiv.textContent = results;
+            resultDiv.className = 'result success';
+        }
+
+        // 页面加载时自动测试健康检查
+        window.addEventListener('DOMContentLoaded', () => {
+            testHealth();
+        });
+    </script>
+</body>
+</html>

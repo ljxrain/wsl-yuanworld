@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>对比案例管理 - 元影AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #90EE90;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #90EE90, #37B679);
+            color: #000;
+        }
+        
+        .btn-secondary {
+            background: #4CAF50;
+            color: #fff;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(144, 238, 144, 0.3);
+        }
+        
+        .case-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px solid #333;
+            transition: all 0.3s;
+        }
+        
+        .case-card:hover {
+            border-color: #90EE90;
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .case-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .case-id {
+            background: #90EE90;
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .case-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            flex: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #90EE90;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #90EE90;
+        }
+        
+        .image-preview-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .image-preview-box {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .image-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            word-break: break-all;
+        }
+        
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .alert-success {
+            background: #4CAF50;
+            color: #fff;
+        }
+        
+        .alert-error {
+            background: #ff4444;
+            color: #fff;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #333;
+            border-top-color: #90EE90;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 模板选择器弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: #2d2d2d;
+            margin: 50px auto;
+            padding: 30px;
+            max-width: 1200px;
+            border-radius: 15px;
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #90EE90;
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            color: #90EE90;
+        }
+        
+        .close-btn {
+            background: #ff4444;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .template-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .template-item:hover {
+            border-color: #90EE90;
+            transform: translateY(-5px);
+        }
+        
+        .template-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .template-item-name {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 对比案例管理</h1>
+        <p class="subtitle">管理Before-After页面展示的案例图片</p>
+        
+        <div class="action-buttons">
+            <button id="addNewBtn" class="btn btn-secondary">➕ 添加新案例</button>
+            <button id="saveAllBtn" class="btn btn-primary">💾 保存所有更改</button>
+        </div>
+        
+        <div id="loadingArea" class="loading">
+            <div class="spinner"></div>
+            <p>正在加载案例数据...</p>
+        </div>
+        
+        <div id="casesArea" style="display: none;"></div>
+    </div>
+    
+    <!-- 模板选择器弹窗 -->
+    <div id="templateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🎨 选择模板图片</h2>
+                <button class="close-btn" onclick="closeTemplateSelector()">✕ 关闭</button>
+            </div>
+            <div id="templateGrid" class="template-grid"></div>
+        </div>
+    </div>
+    
+    <script>
+        let cases = [];
+        let hasChanges = false;
+        let templates = [];
+        let currentCaseIndex = null;
+        
+        // 打开模板选择器
+        async function openTemplateSelector(index) {
+            currentCaseIndex = index;
+            
+            // 加载模板列表
+            if (templates.length === 0) {
+                try {
+                    const response = await fetch('/api/templates');
+                    const data = await response.json();
+                    templates = Array.isArray(data) ? data : (data.templates || []);
+                } catch (error) {
+                    console.error('加载模板失败:', error);
+                    showAlert('加载模板失败', 'error');
+                    return;
+                }
+            }
+            
+            // 渲染模板网格
+            const grid = document.getElementById('templateGrid');
+            grid.innerHTML = templates.map(template => `
+                <div class="template-item" onclick="selectTemplate('${template.image_path}')">
+                    <img src="${template.image_path}" alt="${template.name}">
+                    <div class="template-item-name">${template.name}</div>
+                </div>
+            `).join('');
+            
+            // 显示弹窗
+            document.getElementById('templateModal').style.display = 'block';
+        }
+        
+        // 选择模板
+        function selectTemplate(imagePath) {
+            if (currentCaseIndex === null) return;
+            
+            // 更新URL输入框
+            const urlInput = document.getElementById(`after-url-${currentCaseIndex}`);
+            if (urlInput) {
+                urlInput.value = imagePath;
+                handleUrlInput(currentCaseIndex, 'after');
+            }
+            
+            closeTemplateSelector();
+            showAlert('✅ 已选择模板图片', 'success');
+        }
+        
+        // 关闭模板选择器
+        function closeTemplateSelector() {
+            document.getElementById('templateModal').style.display = 'none';
+            currentCaseIndex = null;
+        }
+        
+        // 加载数据
+        async function loadData() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showAlert('⚠️ 请先登录！正在跳转...', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+                    }, 1500);
+                    return;
+                }
+                
+                console.log('✓ Token存在，继续加载案例...');
+                
+                // 加载案例列表
+                const response = await fetch('/api/before-after');
+                const data = await response.json();
+                cases = Array.isArray(data) ? data : (data.cases || []);
+                
+                console.log(`📋 加载了 ${cases.length} 个案例`);
+                
+                renderCases();
+                
+                document.getElementById('loadingArea').style.display = 'none';
+                document.getElementById('casesArea').style.display = 'block';
+                
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                showAlert('加载数据失败：' + error.message, 'error');
+            }
+        }
+        
+        // 渲染案例列表
+        function renderCases() {
+            const container = document.getElementById('casesArea');
+            container.innerHTML = '';
+            
+            if (cases.length === 0) {
+                container.innerHTML = '<p style="text-align: center; opacity: 0.7;">暂无案例，点击"➕ 添加新案例"创建</p>';
+                return;
+            }
+            
+            cases.forEach((caseItem, index) => {
+                const card = document.createElement('div');
+                card.className = 'case-card';
+                card.innerHTML = `
+                    <div class="case-header">
+                        <span class="case-id">案例 ${index + 1}</span>
+                        <input 
+                            type="text" 
+                            class="form-input case-title" 
+                            id="title-${index}"
+                            placeholder="案例标题（如：都市夜景对比）"
+                            value="${caseItem.title || ''}"
+                            onchange="markChanged()"
+                            style="margin: 0; flex: 1;"
+                        />
+                        <button 
+                            type="button" 
+                            class="btn" 
+                            onclick="deleteCase(${index})"
+                            style="background: #ff4444; margin-left: 10px; padding: 5px 15px;"
+                        >
+                            🗑️ 删除
+                        </button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">📷 Before图片（处理前）</label>
+                            <input 
+                                type="file" 
+                                id="before-file-${index}"
+                                accept="image/*"
+                                onchange="handleImageUpload(${index}, 'before')"
+                                style="display: none;"
+                            >
+                            <button 
+                                type="button" 
+                                class="btn btn-primary" 
+                                onclick="document.getElementById('before-file-${index}').click()"
+                                style="width: 100%; margin-bottom: 10px;"
+                            >
+                                📁 选择Before图片
+                            </button>
+                            <input 
+                                type="text" 
+                                class="form-input" 
+                                id="before-url-${index}"
+                                placeholder="或粘贴图片URL"
+                                value="${caseItem.before_image || ''}"
+                                oninput="handleUrlInput(${index}, 'before')"
+                            />
+                            <div class="image-preview-box">
+                                <img 
+                                    src="${caseItem.before_image || ''}" 
+                                    class="image-preview" 
+                                    id="before-preview-${index}" 
+                                    alt="Before预览"
+                                    style="${caseItem.before_image ? '' : 'display: none;'}"
+                                    onerror="this.style.display='none';"
+                                    onload="this.style.display='block';"
+                                >
+                                <div class="image-info" id="before-info-${index}">
+                                    ${caseItem.before_image ? '已设置' : '未设置'}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">✨ After图片（处理后）</label>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <button 
+                                    type="button" 
+                                    class="btn btn-primary" 
+                                    onclick="openTemplateSelector(${index})"
+                                    style="flex: 1;"
+                                >
+                                    🎨 从模板中心选择
+                                </button>
+                                <button 
+                                    type="button" 
+                                    class="btn btn-secondary" 
+                                    onclick="document.getElementById('after-file-${index}').click()"
+                                    style="flex: 1;"
+                                >
+                                    📁 上传本地图片
+                                </button>
+                            </div>
+                            <input 
+                                type="file" 
+                                id="after-file-${index}"
+                                accept="image/*"
+                                onchange="handleImageUpload(${index}, 'after')"
+                                style="display: none;"
+                            >
+                            <input 
+                                type="text" 
+                                class="form-input" 
+                                id="after-url-${index}"
+                                placeholder="或粘贴图片URL"
+                                value="${caseItem.after_image || ''}"
+                                oninput="handleUrlInput(${index}, 'after')"
+                            />
+                            <div class="image-preview-box">
+                                <img 
+                                    src="${caseItem.after_image || ''}" 
+                                    class="image-preview" 
+                                    id="after-preview-${index}" 
+                                    alt="After预览"
+                                    style="${caseItem.after_image ? '' : 'display: none;'}"
+                                    onerror="this.style.display='none';"
+                                    onload="this.style.display='block';"
+                                >
+                                <div class="image-info" id="after-info-${index}">
+                                    ${caseItem.after_image ? '已设置' : '未设置'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // 处理URL输入
+        function handleUrlInput(index, type) {
+            const input = document.getElementById(`${type}-url-${index}`);
+            const preview = document.getElementById(`${type}-preview-${index}`);
+            const info = document.getElementById(`${type}-info-${index}`);
+            const url = (input.value || '').trim();
+            
+            cases[index][`${type}_image`] = url;
+            markChanged();
+            
+            if (!url) {
+                preview.style.display = 'none';
+                info.textContent = '未设置';
+                return;
+            }
+            
+            preview.onerror = function() {
+                this.style.display = 'none';
+                info.textContent = '❌ 加载失败';
+            };
+            preview.onload = function() {
+                this.style.display = 'block';
+                info.textContent = '✅ 已设置';
+            };
+            preview.src = url;
+            info.textContent = '正在加载...';
+        }
+        
+        // 处理图片上传
+        async function handleImageUpload(index, type) {
+            const fileInput = document.getElementById(`${type}-file-${index}`);
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+            
+            if (file.size > 10 * 1024 * 1024) {
+                showAlert('图片文件太大，请选择小于10MB的图片', 'error');
+                fileInput.value = '';
+                return;
+            }
+            
+            const info = document.getElementById(`${type}-info-${index}`);
+            info.textContent = '正在上传...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('type', type);
+                
+                const response = await fetch('/api/before-after/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || '上传失败');
+                }
+                
+                const imageUrl = data.imageUrl;
+                document.getElementById(`${type}-url-${index}`).value = imageUrl;
+                cases[index][`${type}_image`] = imageUrl;
+                
+                const preview = document.getElementById(`${type}-preview-${index}`);
+                preview.src = imageUrl;
+                preview.style.display = 'block';
+                info.textContent = '✅ 上传成功';
+                
+                markChanged();
+                showAlert(`${type === 'before' ? 'Before' : 'After'}图片上传成功`, 'success');
+                
+            } catch (error) {
+                console.error('上传失败:', error);
+                showAlert('上传失败：' + error.message, 'error');
+                info.textContent = '❌ 上传失败';
+                fileInput.value = '';
+            }
+        }
+        
+        // 添加新案例
+        function addNewCase() {
+            cases.push({
+                title: '',
+                before_image: '',
+                after_image: '',
+                sort_order: cases.length * 10
+            });
+            renderCases();
+            markChanged();
+        }
+        
+        // 删除案例
+        function deleteCase(index) {
+            if (!confirm(`确定要删除案例 ${index + 1} 吗？`)) return;
+            
+            cases.splice(index, 1);
+            renderCases();
+            markChanged();
+            showAlert('案例已删除', 'success');
+        }
+        
+        // 保存所有更改
+        async function saveAll() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showAlert('❌ 请先登录！', 'error');
+                return;
+            }
+            
+            // 更新标题
+            cases.forEach((caseItem, index) => {
+                const title = document.getElementById(`title-${index}`);
+                if (title) caseItem.title = title.value.trim();
+            });
+            
+            try {
+                const response = await fetch('/api/before-after', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ cases })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('保存失败');
+                }
+                
+                hasChanges = false;
+                showAlert('✅ 保存成功！', 'success');
+                
+            } catch (error) {
+                console.error('保存失败:', error);
+                showAlert('❌ 保存失败：' + error.message, 'error');
+            }
+        }
+        
+        // 标记有更改
+        function markChanged() {
+            hasChanges = true;
+            const btn = document.getElementById('saveAllBtn');
+            btn.textContent = '💾 保存所有更改 *';
+        }
+        
+        // 显示提示
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => alert.remove(), 300);
+            }, 3000);
+        }
+        
+        // 页面加载时
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+        
+        // 按钮事件
+        document.getElementById('saveAllBtn').addEventListener('click', saveAll);
+        document.getElementById('addNewBtn').addEventListener('click', addNewCase);
+        
+        // 离开前提示
+        window.addEventListener('beforeunload', (e) => {
+            if (hasChanges) {
+                e.preventDefault();
+                e.returnValue = '你有未保存的更改，确定要离开吗？';
+            }
+        });
+    </script>
+</body>
+</html>
+

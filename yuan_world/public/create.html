@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>立即创作 - 源世界</title>
+    <style>
+        :root { --main-color: #90EE90; --dark-bg: #121212; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--dark-bg); color: #fff; line-height: 1.6; }
+        
+        /* 导航栏 */
+        nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 15px 0; border-bottom: 1px solid rgba(144,238,144,0.2); }
+        .nav-content { max-width: 1400px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; background: linear-gradient(135deg, #90EE90, #37B679); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-link { color: #fff; font-weight: 500; text-decoration: none; transition: color 0.3s; }
+        .nav-link:hover { color: #90EE90; }
+        .user-info { color: var(--main-color); }
+        
+        .container { max-width: 1200px; margin: 80px auto 40px; padding: 40px 20px; }
+       
+        /* 模式选择 */
+        .mode-selector { display: flex; gap: 30px; justify-content: center; margin-bottom: 50px; }
+        .mode-card { flex: 1; max-width: 400px; padding: 40px; background: linear-gradient(135deg, #1a1a1a, #252525); border-radius: 20px; border: 3px solid #333; cursor: pointer; transition: all 0.4s; text-align: center; }
+        .mode-card:hover { transform: translateY(-8px); border-color: rgba(144,238,144,0.5); }
+        .mode-card.selected { border-color: var(--main-color); background: linear-gradient(135deg, rgba(144,238,144,0.1), rgba(55,182,121,0.1)); box-shadow: 0 10px 40px rgba(144,238,144,0.3); }
+        .mode-icon { font-size: 4rem; margin-bottom: 20px; }
+        .mode-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 15px; color: var(--main-color); }
+        .mode-desc { opacity: 0.8; font-size: 1.05rem; line-height: 1.8; }
+        .mode-steps { margin-top: 20px; padding-top: 20px; border-top: 1px solid #333; text-align: left; font-size: 0.95rem; opacity: 0.7; }
+        
+        /* 内容区域 */
+        .creation-area { display: none; animation: fadeIn 0.5s; }
+        .creation-area.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section { background: #1a1a1a; border-radius: 20px; padding: 40px; margin-bottom: 30px; border: 2px solid #333; }
+        .section-title { font-size: 1.8rem; margin-bottom: 10px; color: var(--main-color); display: flex; align-items: center; gap: 10px; }
+        .section-desc { opacity: 0.7; margin-bottom: 30px; font-size: 1.05rem; }
+        
+        /* 上传区域 */
+        .upload-box { border: 3px dashed #444; border-radius: 15px; padding: 50px; text-align: center; cursor: pointer; transition: all 0.3s; background: rgba(255,255,255,0.02); }
+        .upload-box:hover { border-color: var(--main-color); background: rgba(144,238,144,0.05); }
+        .upload-box.has-file { border-color: var(--main-color); background: rgba(144,238,144,0.1); }
+        .upload-icon { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+        .upload-text { font-size: 1.1rem; margin-bottom: 10px; }
+        .upload-hint { font-size: 0.9rem; opacity: 0.6; }
+        .upload-input { display: none; }
+        .upload-preview { margin-top: 20px; text-align: center; }
+        .upload-preview img { max-width: 100%; max-height: 300px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .file-name { margin-top: 15px; color: var(--main-color); font-weight: 500; }
+        
+        /* 模板网格 */
+        .template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .template-card { aspect-ratio: 2/3; border-radius: 15px; overflow: hidden; position: relative; cursor: pointer; transition: all 0.3s; border: 3px solid transparent; background: #222; }
+        .template-card:hover { transform: scale(1.05); }
+        .template-card.selected { border-color: var(--main-color); box-shadow: 0 0 30px rgba(144,238,144,0.6); }
+        .template-card img { width: 100%; height: 100%; object-fit: cover; }
+        .template-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 15px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); }
+        .template-name { font-weight: 600; font-size: 0.95rem; }
+        .template-badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; margin-top: 5px; }
+        .badge-vip { background: gold; color: #111; }
+        
+        /* 表单 */
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 1.1rem; }
+        .form-group textarea { width: 100%; min-height: 120px; padding: 15px; border: 2px solid #444; border-radius: 12px; background: rgba(255,255,255,0.05); color: #fff; font-size: 1rem; font-family: inherit; resize: vertical; }
+        .form-group textarea:focus { outline: none; border-color: var(--main-color); }
+        
+        /* 按钮 */
+        .btn { padding: 16px 40px; border: none; border-radius: 30px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+        .btn-primary { background: linear-gradient(135deg, #90EE90, #37B679); color: #111; }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(144,238,144,0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: #333; color: #fff; }
+        .btn-secondary:hover { background: #444; }
+        .btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+        
+        /* 加载动画 */
+        .loading { text-align: center; padding: 60px 20px; }
+        .spinner { border: 4px solid #333; border-top: 4px solid var(--main-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* 预览区域 */
+        .preview-container { text-align: center; }
+        .preview-image { max-width: 600px; margin: 0 auto 30px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .preview-image img { width: 100%; display: block; }
+        .preview-info { background: rgba(144,238,144,0.1); padding: 20px; border-radius: 15px; margin-bottom: 30px; }
+        .preview-info p { margin: 10px 0; font-size: 1.05rem; }
+        
+        /* 模态框 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #1a1a1a; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; border: 2px solid var(--main-color); }
+        .modal-title { font-size: 1.8rem; margin-bottom: 20px; color: var(--main-color); }
+        .form-input { width: 100%; padding: 12px; border: 2px solid #333; border-radius: 8px; background: #222; color: #fff; font-size: 1rem; margin-bottom: 15px; }
+        .form-input:focus { outline: none; border-color: var(--main-color); }
+        
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        
+        /* 进度步骤 */
+        .progress-step { display: flex; gap: 15px; padding: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; border-left: 4px solid #333; transition: all 0.3s; }
+        .progress-step.processing { border-left-color: #90EE90; background: rgba(144,238,144,0.1); }
+        .progress-step.completed { border-left-color: #90EE90; background: rgba(144,238,144,0.05); opacity: 0.7; }
+        .progress-step.failed { border-left-color: #ff6b6b; background: rgba(255,107,107,0.1); }
+        
+        .step-icon { font-size: 2rem; min-width: 50px; text-align: center; }
+        .progress-step.processing .step-icon { animation: pulse 1.5s ease-in-out infinite; }
+        .progress-step.completed .step-icon::before { content: '✅'; }
+        .progress-step.failed .step-icon::before { content: '❌'; }
+        
+        .step-content { flex: 1; }
+        .step-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 5px; color: var(--main-color); }
+        .step-desc { font-size: 0.9rem; opacity: 0.7; margin-bottom: 5px; }
+        .step-status { font-size: 0.85rem; color: #90EE90; }
+        .progress-step.failed .step-status { color: #ff6b6b; }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Tab Styles */
+        .template-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+        }
+        .tab-btn {
+            padding: 12px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #fff;
+            opacity: 0.6;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover {
+            opacity: 1;
+            color: var(--main-color);
+        }
+        .tab-btn.active {
+            opacity: 1;
+            color: var(--main-color);
+            border-bottom-color: var(--main-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav>
+        <div class="nav-content">
+            <a href="index.html" class="logo">源世界 AI生图</a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">首页</a>
+                <a href="gallery.html" class="nav-link">模板中心</a>
+                <a href="before-after.html" class="nav-link">效果展示</a>
+                <a href="tech-pricing.html" class="nav-link">价格</a>
+                <a href="user-center.html" id="userInfo" class="nav-link hidden" style="color: var(--main-color);">
+                    👤 <span id="username"></span>
+                </a>
+                <button id="loginBtn" class="btn-secondary" onclick="showLoginModal()" style="padding: 8px 20px; font-size: 0.95rem;">登录/注册</button>
+                <button id="logoutBtn" class="btn-secondary hidden" onclick="logout()" style="padding: 8px 20px; font-size: 0.95rem;">退出</button>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- 模式选择 -->
+        <div id="modeSelection">
+            <h1 class="text-center" style="font-size: 2.5rem; margin-bottom: 20px;">选择创作模式</h1>
+            <p class="text-center" style="opacity: 0.7; margin-bottom: 50px; font-size: 1.1rem;">选择适合你的方式，开始AI创作之旅</p>
+            
+            <div class="mode-selector">
+                <!-- 模板模式 -->
+                <div class="mode-card" onclick="selectMode('template')">
+                    <div class="mode-icon">🎨</div>
+                    <div class="mode-title">模板模式</div>
+                    <div class="mode-desc">
+                        从精选模板中选择喜欢的风格<br>
+                        轻松上手，效果出众
+                    </div>
+                    <div class="mode-steps">
+                        <strong>流程：</strong><br>
+                        1️⃣ 选择模板<br>
+                        2️⃣ 上传照片<br>
+                        3️⃣ AI自动生成
+                </div>
+            </div>
+            
+                <!-- 自由模式 -->
+                <div class="mode-card" onclick="selectMode('freestyle')">
+                    <div class="mode-icon">✨</div>
+                    <div class="mode-title">自由模式</div>
+                    <div class="mode-desc">
+                        自由发挥创意，打造独特风格<br>
+                        上传参考图，自定义效果
+                    </div>
+                    <div class="mode-steps">
+                        <strong>流程：</strong><br>
+                        1️⃣ 上传你的照片<br>
+                        2️⃣ 上传参考图+描述<br>
+                        3️⃣ AI创意生成
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 模板模式创作区 -->
+        <div id="templateMode" class="creation-area">
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="backToModeSelection()">← 返回选择模式</button>
+            </div>
+            
+            <!-- 步骤1：选择模板 -->
+            <div id="templateStep1" class="section">
+                <h2 class="section-title">
+                    <span>1️⃣</span>
+                    <span>选择你喜欢的模板</span>
+                </h2>
+                <p class="section-desc">从我们精选的风格模板中选择一个</p>
+                
+                <div class="template-tabs">
+                    <button class="tab-btn active" onclick="displayTemplates('生活照')">生活照</button>
+                    <button class="tab-btn" onclick="displayTemplates('情侣照')">情侣照</button>
+                    <button class="tab-btn" onclick="displayTemplates('婚纱照')">婚纱照</button>
+                </div>
+
+                <div class="template-grid" id="templateGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>加载模板中...</p>
+        </div>
+    </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="templateNextBtn" onclick="templateNext()" disabled>
+                        下一步：上传照片 →
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 步骤2：上传照片 -->
+            <div id="templateStep2" class="section hidden">
+                <h2 class="section-title">
+                    <span>2️⃣</span>
+                    <span>上传你的照片</span>
+                </h2>
+                <p class="section-desc">上传一张清晰的照片，AI将根据你选择的模板风格进行创作</p>
+                
+                <div class="upload-box" onclick="document.getElementById('templateUserImage').click()">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">点击上传照片</div>
+                    <div class="upload-hint">支持 JPG、PNG、WEBP 格式，最大 10MB</div>
+                    <input type="file" id="templateUserImage" class="upload-input" accept="image/*" onchange="handleTemplateUserImage(this)">
+                    <div id="templateUserPreview" class="upload-preview hidden"></div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="templateBack()">← 返回选择模板</button>
+                    <button class="btn btn-primary" id="templateGenerateBtn" onclick="generateWithTemplate()" disabled>
+                        🎨 开始生成
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自由模式创作区 -->
+        <div id="freestyleMode" class="creation-area">
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="backToModeSelection()">← 返回选择模式</button>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">
+                    <span>✨</span>
+                    <span>自由创作</span>
+                </h2>
+                <p class="section-desc">上传你的照片和参考图，描述想要的效果，让AI为你创作</p>
+                
+                <!-- 上传用户照片 -->
+                    <div class="form-group">
+                    <label>1️⃣ 上传你的照片</label>
+                    <div class="upload-box" onclick="document.getElementById('freestyleUserImage').click()">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">点击上传你的照片</div>
+                        <div class="upload-hint">支持 JPG、PNG、WEBP 格式</div>
+                        <input type="file" id="freestyleUserImage" class="upload-input" accept="image/*" onchange="handleFreestyleUserImage(this)">
+                        <div id="freestyleUserPreview" class="upload-preview hidden"></div>
+                    </div>
+                </div>
+                
+                <!-- 上传参考图 -->
+                    <div class="form-group">
+                    <label>2️⃣ 上传参考图（偶像照片/风格参考）</label>
+                    <div class="upload-box" onclick="document.getElementById('freestyleIdolImage').click()">
+                        <div class="upload-icon">🌟</div>
+                        <div class="upload-text">点击上传参考图</div>
+                        <div class="upload-hint">这张图将作为风格参考</div>
+                        <input type="file" id="freestyleIdolImage" class="upload-input" accept="image/*" onchange="handleFreestyleIdolImage(this)">
+                        <div id="freestyleIdolPreview" class="upload-preview hidden"></div>
+                </div>
+            </div>
+            
+                <!-- 输入Prompt -->
+                <div class="form-group">
+                    <label>3️⃣ 描述你想要的效果</label>
+                    <textarea id="freestylePrompt" placeholder="例如：将我的照片和参考图融合，保持参考图的姿势、服装和背景风格，但替换成我的脸部特征。使用柔和的光线，专业摄影质量。" oninput="updateButtons()"></textarea>
+        </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="freestyleGenerateBtn" onclick="generateFreestyle()" disabled>
+                        🎨 开始创作
+                    </button>
+    </div>
+            </div>
+        </div>
+        
+        <!-- 生成中/结果展示 -->
+        <div id="resultArea" class="creation-area">
+            <!-- 生成中 -->
+            <div id="generating" class="section">
+                <h2 style="text-align: center; color: var(--main-color); margin-bottom: 30px;">🎨 AI创作进度</h2>
+                
+                <!-- 进度步骤 -->
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <div class="progress-step" id="step1">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-content">
+                            <div class="step-title">1. 准备数据</div>
+                            <div class="step-desc">获取模板的Prompt和偶像照片</div>
+                            <div class="step-status">等待中...</div>
+            </div>
+                    </div>
+                    
+                    <div class="progress-step" id="step2">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-content">
+                            <div class="step-title">2. 组合数据</div>
+                            <div class="step-desc">用户照片 + 偶像照片 + Prompt</div>
+                            <div class="step-status">等待中...</div>
+            </div>
+        </div>
+
+                    <div class="progress-step" id="step3">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-content">
+                            <div class="step-title">3. 发送到老张API</div>
+                            <div class="step-desc">https://api.laozhang.ai</div>
+                            <div class="step-status">等待中...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-step" id="step4">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-content">
+                            <div class="step-title">4. AI模型处理</div>
+                            <div class="step-desc">Nano Banana 正在生成图片...</div>
+                            <div class="step-status">等待中...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-step" id="step5">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-content">
+                            <div class="step-title">5. 接收结果</div>
+                            <div class="step-desc">老张API返回生成的图片</div>
+                            <div class="step-status">等待中...</div>
+                    </div>
+                    </div>
+                    
+                    <div class="progress-step" id="step6">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-content">
+                            <div class="step-title">6. 保存图片</div>
+                            <div class="step-desc">保存到服务器并添加水印</div>
+                            <div class="step-status">等待中...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; opacity: 0.7;">
+                    <p id="overallStatus">正在处理...</p>
+                    <p style="font-size: 0.9rem; margin-top: 10px;">预计需要 30-60 秒</p>
+                    </div>
+                    </div>
+            
+            <!-- 生成成功 -->
+            <div id="resultSuccess" class="section hidden">
+                <h2 class="section-title text-center">
+                    <span>🎉</span>
+                    <span>创作完成！</span>
+                </h2>
+                
+                <div class="preview-container">
+                    <div class="preview-image">
+                        <img id="resultImage" src="" alt="生成结果">
+                </div>
+                
+                    <div class="preview-info">
+                        <p>⏱️ 生成耗时：<strong id="processingTime">0</strong> 秒</p>
+                        <p>🎁 剩余免费预览：<strong id="remainingPreviews">0</strong> 次</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 10px;">
+                            预览图为水印版本，下载高清无水印版本需付费
+                        </p>
+                </div>
+                
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="startNew()">🔄 重新创作</button>
+                        <button class="btn btn-primary" onclick="downloadHighQuality()">
+                            💎 下载高清版 (¥5)
+                        </button>
+                    </div>
+                </div>
+            </div>
+                
+            <!-- 生成失败 -->
+            <div id="resultError" class="section hidden">
+                <div class="text-center">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">😔</div>
+                    <h2 style="color: #ff6b6b; margin-bottom: 15px;">生成失败</h2>
+                    <p id="errorMessage" style="opacity: 0.7; margin-bottom: 30px;"></p>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="startNew()">← 返回重试</button>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+            
+    <!-- 登录/注册模态框 -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="authTitle">登录</h2>
+            
+            <div id="loginForm">
+                <input type="text" id="loginIdentifier" class="form-input" placeholder="用户名或邮箱">
+                <input type="password" id="loginPassword" class="form-input" placeholder="密码">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="closeAuthModal()">取消</button>
+                    <button class="btn btn-primary" onclick="login()">登录</button>
+                    </div>
+                <p class="text-center" style="margin-top: 20px; opacity: 0.7;">
+                    还没有账号？<a href="#" onclick="switchToRegister()" style="color: var(--main-color);">立即注册</a>
+                </p>
+                </div>
+            
+            <div id="registerForm" class="hidden">
+                <input type="text" id="registerUsername" class="form-input" placeholder="用户名（必填，至少2个字符）">
+                <input type="email" id="registerEmail" class="form-input" placeholder="邮箱（可选，例如：user@example.com）">
+                <input type="password" id="registerPassword" class="form-input" placeholder="密码（必填，至少6个字符）">
+                <input type="password" id="registerPasswordConfirm" class="form-input" placeholder="确认密码">
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="closeAuthModal()">取消</button>
+                    <button class="btn btn-primary" onclick="register()">注册</button>
+                </div>
+                <p class="text-center" style="margin-top: 20px; opacity: 0.7;">
+                    已有账号？<a href="#" onclick="switchToLogin()" style="color: var(--main-color);">立即登录</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 全局变量
+        let currentMode = null; // 'template' or 'freestyle'
+        let selectedTemplateId = null;
+        let selectedTemplate = null;
+        let templateUserImageFile = null;
+        let freestyleUserImageFile = null;
+        let freestyleIdolImageFile = null;
+        let currentUser = null;
+        let currentToken = null;
+        let currentGenerationId = null;
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 页面初始化');
+            checkLoginStatus();
+        });
+        
+        // 检查登录状态
+        async function checkLoginStatus() {
+            currentToken = localStorage.getItem('token');
+
+            if (!currentToken) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                document.getElementById('userInfo').classList.add('hidden');
+                document.getElementById('loginBtn').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.add('hidden');
+                console.log('⚠️ 用户未登录');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    }
+                });
+
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok || !data.user) {
+                    throw new Error(data.message || `HTTP ${response.status}`);
+                }
+
+                currentUser = data.user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                document.getElementById('userInfo').classList.remove('hidden');
+                document.getElementById('username').textContent = currentUser.username;
+                document.getElementById('loginBtn').classList.add('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                console.log('✅ 用户已登录:', currentUser.username);
+            } catch (error) {
+                console.warn('登录状态失效，已自动退出:', error.message || error);
+                logout();
+                alert('登录状态已失效或账户不可用，请重新登录。');
+            }
+        }
+        
+        // 选择模式
+        function selectMode(mode) {
+            if (!currentToken) {
+                alert('请先登录才能使用创作功能');
+                showLoginModal();
+                return;
+            }
+            
+            console.log('📝 选择模式:', mode);
+            currentMode = mode;
+            
+            // 隐藏模式选择
+            document.getElementById('modeSelection').style.display = 'none';
+            
+            // 显示对应的创作区
+            if (mode === 'template') {
+                document.getElementById('templateMode').classList.add('active');
+                loadTemplates();
+            } else {
+                document.getElementById('freestyleMode').classList.add('active');
+            }
+        }
+        
+        // 返回模式选择
+        function backToModeSelection() {
+            document.getElementById('modeSelection').style.display = 'block';
+            document.getElementById('templateMode').classList.remove('active');
+            document.getElementById('freestyleMode').classList.remove('active');
+            document.getElementById('resultArea').classList.remove('active');
+            resetAll();
+        }
+        
+        // 重置所有状态
+        function resetAll() {
+            selectedTemplateId = null;
+            selectedTemplate = null;
+            templateUserImageFile = null;
+            freestyleUserImageFile = null;
+            freestyleIdolImageFile = null;
+            currentGenerationId = null;
+            
+            // 重置UI
+            document.getElementById('templateStep1').classList.remove('hidden');
+            document.getElementById('templateStep2').classList.add('hidden');
+            document.getElementById('templateUserPreview').classList.add('hidden');
+            document.getElementById('freestyleUserPreview').classList.add('hidden');
+            document.getElementById('freestyleIdolPreview').classList.add('hidden');
+            document.getElementById('freestylePrompt').value = '';
+            
+            // 清空文件输入框（重要！）
+            const templateUserInput = document.getElementById('templateUserImage');
+            const freestyleUserInput = document.getElementById('freestyleUserImage');
+            const freestyleIdolInput = document.getElementById('freestyleIdolImage');
+            
+            if (templateUserInput) templateUserInput.value = '';
+            if (freestyleUserInput) freestyleUserInput.value = '';
+            if (freestyleIdolInput) freestyleIdolInput.value = '';
+            
+            updateButtons();
+        }
+        
+        // ========== 模板模式逻辑 ==========
+        
+        // 从数据库加载的模板数据
+        let allTemplates = [];
+        let templatesData = {
+            "生活照": [],
+            "情侣照": [],
+            "婚纱照": []
+        };
+
+        // 从API加载模板
+        async function loadTemplatesFromAPI() {
+            try {
+                const response = await fetch('/api/templates');
+                const data = await response.json();
+                allTemplates = Array.isArray(data) ? data : (data.templates || []);
+                
+                // 按分类整理模板
+                templatesData = {
+                    "生活照": [],
+                    "情侣照": [],
+                    "婚纱照": []
+                };
+                
+                const categoryMap = {
+                    'life': '生活照',
+                    'couple': '情侣照',
+                    'wedding': '婚纱照'
+                };
+                
+                allTemplates.forEach(template => {
+                    const categoryName = categoryMap[template.category];
+                    if (categoryName && templatesData[categoryName]) {
+                        templatesData[categoryName].push(template);
+                    }
+                });
+                
+                console.log(`✅ 加载了 ${allTemplates.length} 个模板`);
+                console.log(`📊 分类统计:`, {
+                    '生活照': templatesData['生活照'].length,
+                    '情侣照': templatesData['情侣照'].length,
+                    '婚纱照': templatesData['婚纱照'].length
+                });
+                
+                // 显示默认分类
+                displayTemplates('生活照');
+                
+            } catch (error) {
+                console.error('❌ 加载模板失败:', error);
+                const grid = document.getElementById('templateGrid');
+                grid.innerHTML = '<p class="text-center" style="padding: 40px; color: #ff6b6b;">加载模板失败，请刷新页面重试</p>';
+            }
+        }
+
+        function displayTemplates(category) {
+            console.log(`📚 Displaying category: ${category}`);
+            const grid = document.getElementById('templateGrid');
+            const templates = templatesData[category] || [];
+
+            // Update active tab
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.textContent === category) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            if (templates.length === 0) {
+                grid.innerHTML = '<p class="text-center" style="padding: 40px; opacity: 0.5;">此分类下暂无模板</p>';
+                return;
+            }
+            
+            grid.innerHTML = templates.map((template) => {
+                const imgSrc = template.image_path || template.image || template.preview_url || '';
+                const templateName = template.name || `${category} #${template.id}`;
+                return `
+                <div class="template-card" onclick="selectTemplate(this, '${imgSrc}', ${template.id})" data-template-id="${template.id}" data-template-url="${imgSrc}">
+                    <img src="${imgSrc}" alt="${templateName}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22%3E%3Crect fill=%22%23333%22 width=%22200%22 height=%22300%22/%3E%3C/svg%3E'">
+                    <div class="template-info">
+                        <div class="template-name">${templateName}</div>
+                    </div>
+                </div>
+            `}).join('');
+
+            // Reset selection when changing category
+            selectedTemplateId = null;
+            selectedTemplate = null;
+            updateButtons();
+        }
+
+        // 加载模板列表
+        function loadTemplates() {
+            // Load templates from API
+            loadTemplatesFromAPI();
+        }
+        
+        // 选择模板
+        function selectTemplate(cardElement, imageUrl, templateId) {
+            // 移除之前的选中状态
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 添加新的选中状态
+            if (cardElement) {
+                cardElement.classList.add('selected');
+            }
+            
+            // 从数据库中查找完整的模板对象
+            const templateObj = allTemplates.find(t => t.id === templateId);
+            
+            if (templateObj) {
+                // 使用数据库中的模板对象
+                selectedTemplateId = templateObj.id;
+                selectedTemplate = {
+                    id: templateObj.id,
+                    name: templateObj.name,
+                    idol_image_url: templateObj.image_path || imageUrl,
+                    prompt: templateObj.prompt || "a photo of a person in the style of the reference image"
+                };
+                
+                console.log('✅ 选中模板:', selectedTemplate.name);
+                console.log('  - ID:', selectedTemplate.id);
+                console.log('  - URL:', selectedTemplate.idol_image_url);
+            } else {
+                // 兼容旧数据
+                selectedTemplateId = imageUrl;
+                selectedTemplate = {
+                    id: imageUrl,
+                    name: cardElement.querySelector('.template-name').textContent,
+                    idol_image_url: imageUrl,
+                    prompt: "a photo of a person in the style of the reference image"
+                };
+            }
+            
+            updateButtons();
+        }
+        
+        // 模板模式：下一步
+        function templateNext() {
+            document.getElementById('templateStep1').classList.add('hidden');
+            document.getElementById('templateStep2').classList.remove('hidden');
+        }
+        
+        // 模板模式：返回
+        function templateBack() {
+            document.getElementById('templateStep2').classList.add('hidden');
+            document.getElementById('templateStep1').classList.remove('hidden');
+        }
+        
+        // 处理模板用户图片上传
+        function handleTemplateUserImage(input) {
+            if (input.files && input.files[0]) {
+                templateUserImageFile = input.files[0];
+                console.log('📸 用户照片已选择:', templateUserImageFile.name);
+                
+                // 显示预览
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const preview = document.getElementById('templateUserPreview');
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="预览">
+                        <div class="file-name">✅ ${templateUserImageFile.name}</div>
+                    `;
+                    preview.classList.remove('hidden');
+                    input.parentElement.classList.add('has-file');
+                };
+                reader.readAsDataURL(templateUserImageFile);
+                
+                updateButtons();
+            }
+        }
+        
+        // 模板模式：生成
+        async function generateWithTemplate() {
+            if (!selectedTemplateId || !templateUserImageFile) {
+                alert('请选择模板并上传照片');
+                return;
+            }
+            
+            console.log('🎨 开始生成（模板模式）');
+            console.log('模板ID:', selectedTemplateId);
+            console.log('模板数据:', selectedTemplate);
+            console.log('用户照片:', templateUserImageFile.name);
+            
+            showGenerating();
+            
+            try {
+                // 步骤1：准备数据
+                updateStep(1, 'processing');
+                document.getElementById('overallStatus').textContent = '步骤1/6: 准备数据...';
+                await sleep(500);
+                
+                // 获取模板信息
+                if (!selectedTemplate || !selectedTemplate.idol_image_url || !selectedTemplate.prompt) {
+                    updateStep(1, 'failed', '模板数据不完整');
+                    throw new Error('模板缺少必要数据（prompt或偶像照片）');
+                }
+                
+                console.log('✓ 模板Prompt:', selectedTemplate.prompt);
+                console.log('✓ 模板偶像照片:', selectedTemplate.idol_image_url);
+                updateStep(1, 'completed');
+                
+                // 步骤2：组合数据
+                updateStep(2, 'processing');
+                document.getElementById('overallStatus').textContent = '步骤2/6: 组合数据...';
+                await sleep(500);
+                
+                const formData = new FormData();
+                formData.append('image', templateUserImageFile);
+                formData.append('templateId', selectedTemplateId);
+                
+                console.log('✓ 数据组合完成');
+                console.log('  - 用户照片:', templateUserImageFile.name);
+                console.log('  - 模板ID:', selectedTemplateId);
+                updateStep(2, 'completed');
+                
+                // 步骤3：发送到老张API
+                updateStep(3, 'processing');
+                document.getElementById('overallStatus').textContent = '步骤3/6: 发送到老张API...';
+                
+                console.log('📤 发送请求到后端API...');
+                console.log('  - Token:', currentToken ? '有' : '无');
+                
+                const response = await fetch('/api/generate/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: formData
+                });
+
+                console.log('📥 收到响应:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    updateStep(3, 'failed', `HTTP ${response.status}`);
+                const data = await response.json();
+                    throw new Error(data.message || '服务器返回错误');
+                }
+                
+                updateStep(3, 'completed');
+                
+                // 步骤4-5：AI处理（后端处理）
+                updateStep(4, 'processing');
+                updateStep(5, 'processing');
+                document.getElementById('overallStatus').textContent = '步骤4-5/6: AI正在生成图片...';
+                
+                const data = await response.json();
+                console.log('📦 响应数据:', data);
+                
+                if (!data.success) {
+                    updateStep(4, 'failed', data.message);
+                    throw new Error(data.message || '生成失败');
+                }
+                
+                updateStep(4, 'completed');
+                updateStep(5, 'completed');
+                
+                // 步骤6：保存图片
+                updateStep(6, 'processing');
+                document.getElementById('overallStatus').textContent = '步骤6/6: 保存图片...';
+                await sleep(500);
+                
+                if (!data.imageUrl) {
+                    updateStep(6, 'failed', '未返回图片URL');
+                    throw new Error('服务器未返回图片URL');
+                }
+                
+                updateStep(6, 'completed');
+                document.getElementById('overallStatus').textContent = '✅ 全部完成！';
+                
+                console.log('✅ 生成成功:', data);
+                
+                // 延迟一下让用户看到所有步骤完成
+                await sleep(1000);
+                showResult(data);
+                
+            } catch (error) {
+                console.error('❌ 生成失败详情:', error);
+                console.error('错误堆栈:', error.stack);
+                document.getElementById('overallStatus').textContent = '❌ 生成失败';
+                
+                // 显示详细错误
+                showError('生成失败：' + error.message + '\n\n请查看上方步骤，了解在哪一步出错\n\n详细信息请按F12查看控制台');
+            }
+        }
+        
+        // 辅助函数：延迟
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // ========== 自由模式逻辑 ==========
+        
+        // 处理自由模式用户图片
+        function handleFreestyleUserImage(input) {
+            if (input.files && input.files[0]) {
+                freestyleUserImageFile = input.files[0];
+                showImagePreview(input.files[0], 'freestyleUserPreview', input.parentElement);
+                updateButtons();
+            }
+        }
+        
+        // 处理自由模式偶像图片
+        function handleFreestyleIdolImage(input) {
+            if (input.files && input.files[0]) {
+                freestyleIdolImageFile = input.files[0];
+                showImagePreview(input.files[0], 'freestyleIdolPreview', input.parentElement);
+                updateButtons();
+            }
+        }
+        
+        // 显示图片预览
+        function showImagePreview(file, previewId, uploadBox) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                const preview = document.getElementById(previewId);
+                preview.innerHTML = `
+                    <img src="${e.target.result}" alt="预览">
+                    <div class="file-name">✅ ${file.name}</div>
+                `;
+                preview.classList.remove('hidden');
+                uploadBox.classList.add('has-file');
+                };
+                reader.readAsDataURL(file);
+            }
+        
+        // 自由模式：生成
+        async function generateFreestyle() {
+            const prompt = document.getElementById('freestylePrompt').value.trim();
+            
+            if (!freestyleUserImageFile || !freestyleIdolImageFile || !prompt) {
+                alert('请上传照片、参考图并填写描述');
+                return;
+            }
+            
+            console.log('✨ 开始生成（自由模式）');
+            console.log('用户照片:', freestyleUserImageFile.name);
+            console.log('参考图:', freestyleIdolImageFile.name);
+            console.log('Prompt:', prompt);
+            
+            showGenerating();
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', freestyleUserImageFile);
+                formData.append('idolImage', freestyleIdolImageFile);
+                formData.append('prompt', prompt);
+                
+                console.log('📤 发送请求到后端...');
+                console.log('  - 照片:', freestyleUserImageFile.name);
+                console.log('  - 参考图:', freestyleIdolImageFile.name);
+                console.log('  - Prompt:', prompt.substring(0, 50) + '...');
+                console.log('  - Token:', currentToken ? '有' : '无');
+                
+                const response = await fetch('/api/generate/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: formData
+                });
+                
+                console.log('📥 收到响应:', response.status, response.statusText);
+
+                const data = await response.json();
+                console.log('📦 响应数据:', data);
+                
+                if (!response.ok) {
+                    let errorMsg = data.message || '生成失败';
+                    if (data.details) {
+                        errorMsg += '\n详情: ' + JSON.stringify(data.details);
+                    }
+                    throw new Error(errorMsg);
+                }
+                
+                console.log('✅ 生成成功:', data);
+                showResult(data);
+                
+            } catch (error) {
+                console.error('❌ 生成失败详情:', error);
+                console.error('错误堆栈:', error.stack);
+                showError(error.message + '\n\n请查看浏览器控制台(F12)获取详细信息');
+            }
+        }
+        
+        // ========== 结果展示 ==========
+        
+        // 更新步骤状态
+        function updateStep(stepNumber, status, message) {
+            const step = document.getElementById(`step${stepNumber}`);
+            const statusElement = step.querySelector('.step-status');
+            
+            // 移除所有状态类
+            step.classList.remove('processing', 'completed', 'failed');
+            
+            // 添加新状态
+            step.classList.add(status);
+            
+            // 更新状态文本
+            if (message) {
+                statusElement.textContent = message;
+            }
+            
+            // 如果是processing，添加动画
+            if (status === 'processing') {
+                statusElement.textContent = '正在处理...';
+            } else if (status === 'completed') {
+                statusElement.textContent = '✓ 完成';
+            } else if (status === 'failed') {
+                statusElement.textContent = '✗ 失败: ' + message;
+            }
+        }
+        
+        // 重置所有步骤
+        function resetAllSteps() {
+            for (let i = 1; i <= 6; i++) {
+                const step = document.getElementById(`step${i}`);
+                step.classList.remove('processing', 'completed', 'failed');
+                const statusElement = step.querySelector('.step-status');
+                statusElement.textContent = '等待中...';
+            }
+        }
+        
+        // 显示生成中
+        function showGenerating() {
+            document.getElementById('templateMode').classList.remove('active');
+            document.getElementById('freestyleMode').classList.remove('active');
+            document.getElementById('resultArea').classList.add('active');
+            document.getElementById('generating').classList.remove('hidden');
+            document.getElementById('resultSuccess').classList.add('hidden');
+            document.getElementById('resultError').classList.add('hidden');
+            
+            // 重置所有步骤
+            resetAllSteps();
+        }
+        
+        // 显示生成结果
+        async function showResult(data) {
+            console.log("Showing result with data:", data);
+            const imageUrl = data.imageUrl || data.previewImageUrl;
+            if (!imageUrl) {
+                console.error("showResult called, but no image URL found!", data);
+                throw new Error('服务器未返回图片URL');
+            }
+
+            currentGenerationId = data.generationId;
+
+            // 隐藏进度界面
+            document.getElementById('generating').classList.add('hidden');
+            // 显示成功结果界面
+            document.getElementById('resultSuccess').classList.remove('hidden');
+
+            const resultImage = document.getElementById('resultImage');
+            resultImage.src = `${imageUrl}?t=${Date.now()}`;
+            
+            // 显示信息
+            document.getElementById('processingTime').textContent = data.processingTime || '0';
+            document.getElementById('remainingPreviews').textContent = data.remainingPreviews || '0';
+            
+            console.log('✅ 结果显示完成！图片URL:', imageUrl);
+        }
+
+        async function register() {
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+            
+            // 必填项验证
+            if (!username || !password || !passwordConfirm) {
+                alert('请填写必填字段：\n- 用户名\n- 密码\n- 确认密码');
+                return;
+            }
+            
+            // 用户名验证
+            if (username.length < 2) {
+                alert('用户名至少需要2个字符');
+                return;
+            }
+            
+            // 邮箱验证（如果填写了）
+            if (email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('邮箱格式不正确\n\n请输入有效的邮箱地址，例如：\nuser@example.com\n或者留空不填写邮箱');
+                    return;
+                }
+            }
+            
+            // 密码验证
+            if (password.length < 6) {
+                alert('密码至少需要6个字符');
+                return;
+                }
+            
+            if (password !== passwordConfirm) {
+                alert('两次密码输入不一致');
+                return;
+            }
+
+            try {
+                // 构建注册数据（如果邮箱为空就不发送）
+                const registerData = { username, password };
+                if (email) {
+                    registerData.email = email;
+                }
+                
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registerData)
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || '注册失败');
+                }
+                
+                console.log('✅ 注册成功');
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                
+                closeAuthModal();
+                checkLoginStatus();
+                
+            } catch (error) {
+                alert('注册失败：' + error.message);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
+            currentToken = null;
+            currentUser = null;
+            
+            document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('loginBtn').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+            
+            backToModeSelection();
+        }
+
+        // 更新按钮状态
+        function updateButtons() {
+            // 模板模式：下一步按钮
+            const templateNextBtn = document.getElementById('templateNextBtn');
+            if (templateNextBtn) {
+                templateNextBtn.disabled = !selectedTemplateId;
+            }
+            
+            // 模板模式：生成按钮
+            const templateGenerateBtn = document.getElementById('templateGenerateBtn');
+            if (templateGenerateBtn) {
+                templateGenerateBtn.disabled = !templateUserImageFile;
+            }
+            
+            // 自由模式：生成按钮
+            const freestyleGenerateBtn = document.getElementById('freestyleGenerateBtn');
+            if (freestyleGenerateBtn) {
+                const prompt = document.getElementById('freestylePrompt').value.trim();
+                freestyleGenerateBtn.disabled = !freestyleUserImageFile || !freestyleIdolImageFile || !prompt;
+            }
+        }
+        
+        // 显示错误
+        function showError(message) {
+            document.getElementById('generating').classList.add('hidden');
+            document.getElementById('resultSuccess').classList.add('hidden');
+            document.getElementById('resultError').classList.remove('hidden');
+            document.getElementById('errorMessage').textContent = message;
+        }
+        
+        // 开始新的创作
+        function startNew() {
+            backToModeSelection();
+        }
+        
+        // 下载高清版
+        async function downloadHighQuality() {
+            if (!currentGenerationId) {
+                alert('生成ID丢失，无法下载');
+                return;
+            }
+            
+            alert('下载功能开发中...\n生成ID: ' + currentGenerationId);
+        }
+        
+        // 登录
+        async function login() {
+            const identifier = document.getElementById('loginIdentifier').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!identifier || !password) {
+                alert('请输入用户名/邮箱和密码');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || '登录失败');
+                }
+                
+                console.log('✅ 登录成功');
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                
+                closeAuthModal();
+                checkLoginStatus();
+                
+            } catch (error) {
+                alert('登录失败：' + error.message);
+            }
+        }
+        
+        // 显示登录模态框
+        function showLoginModal() {
+            document.getElementById('authModal').classList.add('active');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('authTitle').textContent = '登录';
+        }
+        
+        // 关闭登录模态框
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+        
+        // 切换到注册
+        function switchToRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('authTitle').textContent = '注册';
+        }
+        
+        // 切换到登录
+        function switchToLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('authTitle').textContent = '登录';
+        }
+
+        // 更新按钮状态
+        function updateButtons() {
+            // 模板模式：下一步按钮
+            const templateNextBtn = document.getElementById('templateNextBtn');
+            if (templateNextBtn) {
+                templateNextBtn.disabled = !selectedTemplateId;
+            }
+            
+            // 模板模式：生成按钮
+            const templateGenerateBtn = document.getElementById('templateGenerateBtn');
+            if (templateGenerateBtn) {
+                templateGenerateBtn.disabled = !templateUserImageFile;
+            }
+            
+            // 自由模式：生成按钮
+            const freestyleGenerateBtn = document.getElementById('freestyleGenerateBtn');
+            if (freestyleGenerateBtn) {
+                const prompt = document.getElementById('freestylePrompt').value.trim();
+                freestyleGenerateBtn.disabled = !freestyleUserImageFile || !freestyleIdolImageFile || !prompt;
+            }
+        }
+        
+        // 显示错误
+        function showError(message) {
+            document.getElementById('generating').classList.add('hidden');
+            document.getElementById('resultSuccess').classList.add('hidden');
+            document.getElementById('resultError').classList.remove('hidden');
+            document.getElementById('errorMessage').textContent = message;
+        }
+        
+        // 开始新的创作
+        function startNew() {
+            backToModeSelection();
+        }
+        
+        // 下载高清版
+        async function downloadHighQuality() {
+            if (!currentGenerationId) {
+                alert('生成ID丢失，无法下载');
+                return;
+            }
+            
+            alert('下载功能开发中...\n生成ID: ' + currentGenerationId);
+        }
+        
+        // 登录
+        async function login() {
+            const identifier = document.getElementById('loginIdentifier').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!identifier || !password) {
+                alert('请输入用户名/邮箱和密码');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || '登录失败');
+                }
+                
+                console.log('✅ 登录成功');
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('currentUser', JSON.stringify(data.user));
+                
+                closeAuthModal();
+                checkLoginStatus();
+                
+            } catch (error) {
+                alert('登录失败：' + error.message);
+            }
+        }
+        
+        // 显示登录模态框
+        function showLoginModal() {
+            document.getElementById('authModal').classList.add('active');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('authTitle').textContent = '登录';
+        }
+        
+        // 关闭登录模态框
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+        
+        // 切换到注册
+        function switchToRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('authTitle').textContent = '注册';
+        }
+        
+        // 切换到登录
+        function switchToLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('authTitle').textContent = '登录';
+        }
+    </script>
+</body>
+</html>
+

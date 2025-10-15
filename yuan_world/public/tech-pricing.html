@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术与价格 - 源世界</title>
+    <style>
+        :root { --main-color: #90EE90; --dark-bg: #121212; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--dark-bg); color: #fff; line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+
+        .navbar { position: fixed; top: 0; width: 100%; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(15px); z-index: 1000; padding: 15px 0; border-bottom: 1px solid rgba(144,238,144,0.2); }
+        .navbar-content { max-width: 1400px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; background: linear-gradient(135deg, #90EE90, #37B679); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+        .nav-menu { display: flex; gap: 30px; align-items: center; }
+        .nav-link { color: #fff; font-weight: 500; text-decoration: none; transition: color 0.3s; }
+        .nav-link:hover { color: #90EE90; }
+        .nav-btn { background: linear-gradient(135deg, #90EE90, #37B679); color: #111; padding: 10px 25px; border-radius: 25px; font-weight: 600; text-decoration: none; display: inline-block; transition: transform 0.3s; }
+        .nav-btn:hover { transform: scale(1.05); }
+        body { padding-top: 70px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 60px 20px; text-align: center; }
+        .section-title { font-size: 2.5rem; margin-bottom: 20px; color: var(--main-color); }
+        .section-subtitle { font-size: 1.1rem; margin-bottom: 50px; opacity: 0.8; }
+
+        .features-grid { display: grid; grid-template-columns: 1fr; gap: 20px; text-align: left; margin-bottom: 60px; }
+        .feature-card { background: #1a1a1a; padding: 25px; border-radius: 15px; border-left: 4px solid var(--main-color); }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .stat-item { background: #1a1a1a; padding: 25px; border-radius: 15px; }
+        .stat-number { font-size: 2rem; font-weight: bold; color: var(--main-color); display: block; }
+        
+        .pricing-grid { display: flex; flex-direction: column; align-items: center; gap: 30px; }
+        .pricing-card { background: #1a1a1a; padding: 30px; border-radius: 20px; width: 100%; max-width: 320px; border: 2px solid #333; position: relative; }
+        .pricing-card.featured { border-color: var(--main-color); transform: scale(1.05); }
+        .pricing-card.featured::before { content: '强烈推荐'; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #90EE90, #37B679); color: #111; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; }
+        .pricing-features { list-style: none; margin: 25px 0; text-align: left; }
+        .pricing-features li { padding: 8px 0; }
+        .btn-pricing { display: block; width: 100%; padding: 15px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; }
+        .btn-standard { background: #333; color: #fff; }
+        .btn-premium { background: linear-gradient(135deg, #90EE90, #37B679); color: #111; }
+        .btn-pricing:hover { transform: translateY(-2px); }
+        
+        @media (min-width: 768px) {
+            .features-grid { grid-template-columns: repeat(3, 1fr); }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .pricing-grid { flex-direction: row; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-content">
+            <a href="index.html" class="logo">源世界</a>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">首页</a>
+                <a href="gallery.html" class="nav-link">模板中心</a>
+                <a href="before-after.html" class="nav-link">Before/After</a>
+                <a href="tech-pricing.html" class="nav-link" style="color: #90EE90;">AI技术与价格</a>
+                <a href="create.html" class="nav-btn">立即创作</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <h1 class="section-title">顶尖科技，圆梦此刻</h1>
+        <p class="section-subtitle">我们采用行业领先的AI技术，只为给你最真实、最心动的合成体验。</p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>🤖 旗舰级AI引擎</h3>
+                <p>基于深度学习的人脸融合算法，合成效果自然无痕。</p>
+            </div>
+            <div class="feature-card">
+                <h3>⚡️ 闪电般生成速度</h3>
+                <p>分布式GPU集群加速，3秒预览，30秒高清出图。</p>
+            </div>
+            <div class="feature-card">
+                <h3>🔒 银行级隐私保护</h3>
+                <p>所有上传照片均加密处理，24小时后自动销毁。</p>
+            </div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number">50万+</span>
+                <span class="stat-label">忠实粉丝</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">300万+</span>
+                <span class="stat-label">圆梦作品</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">99.2%</span>
+                <span class="stat-label">用户好评</span>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="pricing">
+        <h1 class="section-title">圆梦方案</h1>
+        <p class="section-subtitle">选择最适合你的方案，即刻开启专属平行时空。</p>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <h3>心动体验</h3>
+                <div style="font-size: 2.5rem; font-weight: bold;">¥5</div>
+                <div style="opacity: 0.7;">每张</div>
+                <ul class="pricing-features">
+                    <li>✅ 高清无水印</li>
+                    <li>✅ 解锁基础模板</li>
+                    <li>✅ 为爱发电</li>
+                </ul>
+                <a href="create.html" class="btn-pricing btn-standard">单次圆梦</a>
+            </div>
+            <div class="pricing-card featured">
+                <h3>专属源世界</h3>
+                <div style="font-size: 2.5rem; font-weight: bold;">¥29</div>
+                <div style="opacity: 0.7;">包月</div>
+                <ul class="pricing-features">
+                    <li>✅ <strong>无限次</strong>下载</li>
+                    <li>✅ 解锁<strong>所有</strong>模板</li>
+                    <li>✅ <strong>优先极速</strong>生成</li>
+                </ul>
+                <a href="create.html" class="btn-pricing btn-premium">包月入驻</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

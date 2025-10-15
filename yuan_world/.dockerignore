@@ -1,0 +1,48 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Test
+coverage
+.nyc_output
+
+# Documentation
+*.md
+!README.md
+
+# Database dumps (except production backup)
+*.dump
+*.sql
+
+# Temporary files
+tmp
+temp
+
+# WSL setup
+setup-wsl.sh
+WSL-DEPLOYMENT.md

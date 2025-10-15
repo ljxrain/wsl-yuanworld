@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>API测试页面（无CSP问题版）</title>
+    <link rel="stylesheet" href="test-style.css">
+</head>
+<body>
+    <h1>🔧 源世界 API 测试工具（外部JS版）</h1>
+    
+    <div class="test-section">
+        <h2>1. 测试服务器健康状态</h2>
+        <button onclick="testHealth()">测试健康检查</button>
+        <button onclick="testClick()" style="background: #2196F3;">测试点击</button>
+        <div id="health-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 测试用户登录</h2>
+        <input type="email" id="login-email" placeholder="邮箱" value="admin@yuanworld.com">
+        <input type="password" id="login-password" placeholder="密码" value="admin123456">
+        <button onclick="testLogin()">测试登录</button>
+        <div id="login-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 测试用户注册</h2>
+        <input type="text" id="reg-username" placeholder="用户名" value="testuser">
+        <input type="email" id="reg-email" placeholder="邮箱" value="test@example.com">
+        <input type="password" id="reg-password" placeholder="密码" value="test123456">
+        <button onclick="testRegister()">测试注册</button>
+        <div id="register-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 测试静态文件加载</h2>
+        <button onclick="testStaticFiles()">测试文件</button>
+        <div id="static-result" class="result"></div>
+    </div>
+
+    <script src="test-api.js"></script>
+</body>
+</html>
