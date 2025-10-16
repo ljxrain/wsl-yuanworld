@@ -438,7 +438,8 @@
         async function checkAuth() {
             const token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = '/yuan/login.html';
+                alert('请先登录才能访问用户管理页面');
+                window.location.href = '/yuan/create.html';
                 return;
             }
 
@@ -451,7 +452,8 @@
 
                 if (!response.ok) {
                     localStorage.removeItem('token');
-                    window.location.href = '/yuan/login.html';
+                    alert('登录已过期，请重新登录');
+                    window.location.href = '/yuan/create.html';
                     return;
                 }
 
@@ -462,7 +464,8 @@
                 }
             } catch (error) {
                 console.error('认证检查失败:', error);
-                window.location.href = '/yuan/login.html';
+                alert('认证失败，请重新登录');
+                window.location.href = '/yuan/create.html';
             }
         }
 
