@@ -1,0 +1,62 @@
+/* 源世界通用样式 */
+:root {
+    --main-color: #90EE90;
+    --secondary-color: #37B679;
+    --dark-bg: #111;
+    --text-color: #333;
+    --light-bg: #f8f9fa;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #fff;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--main-color);
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+button {
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+input, select, textarea {
+    font-family: inherit;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+}
+
