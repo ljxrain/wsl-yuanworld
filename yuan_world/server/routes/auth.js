@@ -145,6 +145,26 @@ router.post('/login', async (req, res) => {
         user.last_login_at = new Date();
         await user.save();
 
+        // 记录登录日志
+        try {
+            const { sequelize } = require('../models');
+            await sequelize.query(
+                `INSERT INTO login_logs (user_id, username, ip_address, user_agent, login_success) 
+                 VALUES (:user_id, :username, :ip_address, :user_agent, true)`,
+                {
+                    replacements: {
+                        user_id: user.id,
+                        username: user.username,
+                        ip_address: req.ip || req.connection.remoteAddress,
+                        user_agent: req.get('user-agent') || ''
+                    }
+                }
+            );
+        } catch (logError) {
+            console.error('记录登录日志失败:', logError);
+            // 不影响登录流程
+        }
+
         // 生成token
         const token = generateToken(user.id);
 

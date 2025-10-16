@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 源世界</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .user-management {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .user-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge-vip {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .badge-admin {
+            background: #ff4757;
+            color: white;
+        }
+
+        .badge-active {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .badge-inactive {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: var(--main-color);
+            color: white;
+            border-color: var(--main-color);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination .current-page {
+            font-weight: 600;
+            color: var(--main-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--main-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .user-detail-section {
+            margin-bottom: 25px;
+        }
+
+        .user-detail-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--main-color);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-item label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-item value {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .records-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .record-item:hover {
+            background: #e9ecef;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--main-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="user-management">
+        <h1 style="color: var(--main-color); margin-bottom: 30px;">👥 用户管理与行为分析</h1>
+
+        <!-- 统计卡片 -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <h3>总用户数</h3>
+                <p class="value" id="totalUsers">-</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <h3>活跃用户</h3>
+                <p class="value" id="activeUsers">-</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <h3>总预览次数</h3>
+                <p class="value" id="totalPreviews">-</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <h3>总下载次数</h3>
+                <p class="value" id="totalDownloads">-</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <h3>总登录次数</h3>
+                <p class="value" id="totalLogins">-</p>
+            </div>
+        </div>
+
+        <!-- 过滤器 -->
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>搜索用户</label>
+                    <input type="text" id="searchInput" placeholder="用户名或邮箱">
+                </div>
+                <div class="filter-group">
+                    <label>注册开始日期</label>
+                    <input type="date" id="dateFrom">
+                </div>
+                <div class="filter-group">
+                    <label>注册结束日期</label>
+                    <input type="date" id="dateTo">
+                </div>
+                <div class="filter-group" style="justify-content: flex-end;">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="applyFilters()">🔍 搜索</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户表格 -->
+        <div class="user-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>注册时间</th>
+                        <th>最后登录</th>
+                        <th>状态</th>
+                        <th>预览</th>
+                        <th>下载</th>
+                        <th>登录次数</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr>
+                        <td colspan="8" class="loading">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 分页 -->
+            <div class="pagination">
+                <button id="prevBtn" onclick="changePage(-1)">上一页</button>
+                <span class="current-page">第 <span id="currentPage">1</span> 页 / 共 <span id="totalPages">1</span> 页</span>
+                <button id="nextBtn" onclick="changePage(1)">下一页</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户详情模态框 -->
+    <div class="modal" id="userDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>用户详情</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="userDetailContent">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentFilters = {};
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadNavbar();
+            await checkAuth();
+            await loadOverview();
+            await loadUsers();
+        });
+
+        // 加载导航栏
+        async function loadNavbar() {
+            try {
+                const response = await fetch('/navbar.html');
+                const html = await response.text();
+                document.getElementById('navbar-placeholder').innerHTML = html;
+            } catch (error) {
+                console.error('加载导航栏失败:', error);
+            }
+        }
+
+        // 检查认证和权限
+        async function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                const data = await response.json();
+                if (!data.user.is_admin) {
+                    alert('您没有权限访问此页面');
+                    window.location.href = '/index.html';
+                }
+            } catch (error) {
+                console.error('认证检查失败:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // 加载概览数据
+        async function loadOverview() {
+            const token = localStorage.getItem('token');
+            try {
+                let url = '/api/user-analytics/overview';
+                const params = new URLSearchParams();
+                if (currentFilters.dateFrom) params.append('dateFrom', currentFilters.dateFrom);
+                if (currentFilters.dateTo) params.append('dateTo', currentFilters.dateTo);
+                if (params.toString()) url += '?' + params.toString();
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const { overview } = data;
+                    document.getElementById('totalUsers').textContent = overview.total_users;
+                    document.getElementById('activeUsers').textContent = overview.active_users;
+                    document.getElementById('totalPreviews').textContent = overview.total_previews;
+                    document.getElementById('totalDownloads').textContent = overview.total_downloads;
+                    document.getElementById('totalLogins').textContent = overview.total_logins;
+                }
+            } catch (error) {
+                console.error('加载概览数据失败:', error);
+            }
+        }
+
+        // 加载用户列表
+        async function loadUsers() {
+            const token = localStorage.getItem('token');
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="loading">加载中...</td></tr>';
+
+            try {
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    limit: 50,
+                    ...currentFilters
+                });
+
+                const response = await fetch(`/api/user-analytics/users?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('加载失败');
+
+                const data = await response.json();
+                const { users, pagination } = data;
+
+                totalPages = pagination.pages;
+                document.getElementById('currentPage').textContent = currentPage;
+                document.getElementById('totalPages').textContent = totalPages;
+
+                // 更新分页按钮状态
+                document.getElementById('prevBtn').disabled = currentPage === 1;
+                document.getElementById('nextBtn').disabled = currentPage === totalPages;
+
+                if (users.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <div>暂无用户数据</div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = users.map(user => `
+                    <tr onclick="showUserDetail('${user.id}')">
+                        <td>
+                            ${user.username}
+                            ${user.is_admin ? '<span class="badge badge-admin">管理员</span>' : ''}
+                            ${user.is_vip ? '<span class="badge badge-vip">VIP</span>' : ''}
+                        </td>
+                        <td>${user.email || '-'}</td>
+                        <td>${formatDateTime(user.registration_time)}</td>
+                        <td>${user.last_login_time ? formatDateTime(user.last_login_time) : '-'}</td>
+                        <td>
+                            <span class="badge ${user.is_active ? 'badge-active' : 'badge-inactive'}">
+                                ${user.is_active ? '活跃' : '禁用'}
+                            </span>
+                        </td>
+                        <td>${user.preview_count}</td>
+                        <td>${user.download_count}</td>
+                        <td>${user.login_count}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('加载用户列表失败:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: red;">
+                            加载失败，请刷新重试
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // 应用过滤器
+        function applyFilters() {
+            currentFilters = {
+                search: document.getElementById('searchInput').value,
+                dateFrom: document.getElementById('dateFrom').value,
+                dateTo: document.getElementById('dateTo').value
+            };
+            currentPage = 1;
+            loadOverview();
+            loadUsers();
+        }
+
+        // 切换页面
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                loadUsers();
+            }
+        }
+
+        // 显示用户详情
+        async function showUserDetail(userId) {
+            const modal = document.getElementById('userDetailModal');
+            const content = document.getElementById('userDetailContent');
+            
+            modal.classList.add('active');
+            content.innerHTML = '<div class="loading">加载中...</div>';
+
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch(`/api/user-analytics/users/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('加载失败');
+
+                const data = await response.json();
+                const { userInfo, previewRecords, downloadRecords, loginRecords } = data;
+
+                content.innerHTML = `
+                    <div class="user-detail-section">
+                        <h3>基本信息</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>用户名</label>
+                                <value>${userInfo.username}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>邮箱</label>
+                                <value>${userInfo.email || '-'}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>注册时间</label>
+                                <value>${formatDateTime(userInfo.registration_time)}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>最后登录</label>
+                                <value>${userInfo.last_login_at ? formatDateTime(userInfo.last_login_at) : '-'}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>状态</label>
+                                <value>
+                                    <span class="badge ${userInfo.is_active ? 'badge-active' : 'badge-inactive'}">
+                                        ${userInfo.is_active ? '活跃' : '禁用'}
+                                    </span>
+                                </value>
+                            </div>
+                            <div class="info-item">
+                                <label>会员状态</label>
+                                <value>${userInfo.is_vip ? '✅ VIP会员' : '普通用户'}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>剩余预览次数</label>
+                                <value>${userInfo.free_previews}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>余额</label>
+                                <value>¥${userInfo.balance}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>总登录次数</label>
+                                <value>${userInfo.total_logins}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>预览次数</label>
+                                <value>${userInfo.preview_count}</value>
+                            </div>
+                            <div class="info-item">
+                                <label>下载次数</label>
+                                <value>${userInfo.download_count}</value>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-detail-section">
+                        <h3>最近登录记录（最近30次）</h3>
+                        <div class="records-list">
+                            ${loginRecords.length > 0 ? loginRecords.map(record => `
+                                <div class="record-item">
+                                    <div><strong>登录时间：</strong>${formatDateTime(record.login_time)}</div>
+                                    <div><strong>IP地址：</strong>${record.ip_address || '-'}</div>
+                                    <div style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                                        ${record.user_agent || '-'}
+                                    </div>
+                                </div>
+                            `).join('') : '<div style="text-align: center; padding: 20px; color: #999;">暂无登录记录</div>'}
+                        </div>
+                    </div>
+
+                    <div class="user-detail-section">
+                        <h3>最近预览记录（最近20次）</h3>
+                        <div class="records-list">
+                            ${previewRecords.length > 0 ? previewRecords.map(record => `
+                                <div class="record-item">
+                                    <div><strong>时间：</strong>${formatDateTime(record.created_at)}</div>
+                                    <div><strong>模板：</strong>${record.template_name || '自由创作'}</div>
+                                    <div><strong>状态：</strong>${getStatusText(record.status)}</div>
+                                    ${record.processing_time ? `<div><strong>耗时：</strong>${record.processing_time}秒</div>` : ''}
+                                </div>
+                            `).join('') : '<div style="text-align: center; padding: 20px; color: #999;">暂无预览记录</div>'}
+                        </div>
+                    </div>
+
+                    <div class="user-detail-section">
+                        <h3>最近下载记录（最近20次）</h3>
+                        <div class="records-list">
+                            ${downloadRecords.length > 0 ? downloadRecords.map(record => `
+                                <div class="record-item">
+                                    <div><strong>时间：</strong>${formatDateTime(record.created_at)}</div>
+                                    <div><strong>模板：</strong>${record.template_name || '自由创作'}</div>
+                                    <div><strong>金额：</strong>¥${record.payment_amount || 0}</div>
+                                    <div><strong>状态：</strong>${getStatusText(record.status)}</div>
+                                </div>
+                            `).join('') : '<div style="text-align: center; padding: 20px; color: #999;">暂无下载记录</div>'}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('加载用户详情失败:', error);
+                content.innerHTML = '<div style="text-align: center; color: red;">加载失败，请重试</div>';
+            }
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('userDetailModal').classList.remove('active');
+        }
+
+        // 格式化日期时间
+        function formatDateTime(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待处理',
+                'processing': '处理中',
+                'completed': '已完成',
+                'failed': '失败'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 点击模态框外部关闭
+        document.getElementById('userDetailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
