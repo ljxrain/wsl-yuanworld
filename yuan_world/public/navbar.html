@@ -11,7 +11,7 @@
             <a href="/yuan/tech-pricing.html" class="nav-item" style="color: #fff; font-weight: 500; text-decoration: none; transition: color 0.3s;">AI技术与价格</a>
             <a href="/yuan/user-management.html" id="userManagementLink" class="nav-item" style="display: none; color: #fff; font-weight: 500; text-decoration: none; transition: color 0.3s;">👥 用户管理</a>
             <a href="/yuan/create.html" style="background: linear-gradient(135deg, #90EE90, #37B679); color: #111; padding: 10px 25px; border-radius: 25px; font-weight: 600; text-decoration: none; transition: transform 0.3s; display: inline-block;">立即创作</a>
-            <a href="/yuan/create.html" id="authLink" style="color: #90EE90; font-weight: 500; text-decoration: none; transition: color 0.3s;">登录/注册</a>
+            <a href="/yuan/login.html" id="authLink" style="color: #90EE90; font-weight: 500; text-decoration: none; transition: color 0.3s;">登录/注册</a>
         </div>
 
         <!-- 手机端菜单按钮 -->
@@ -69,7 +69,7 @@
         const authLink = document.getElementById('authLink');
         if (authLink) {
             authLink.textContent = currentUser.username;
-            authLink.href = 'create.html';
+            authLink.href = '/yuan/create.html';
         }
         
         // 如果是管理员，显示用户管理链接
